@@ -1,0 +1,20 @@
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.hero-image-wrapper {
+  border: 1.5px solid rgba(255, 77, 0, 0.6);
+  border-radius: 50%;
+  box-shadow:
+    0 0 20px rgba(255, 77, 0, 0.15),
+    0 0 60px rgba(255, 77, 0, 0.05);
+  animation: hero-float 6s ease-in-out infinite;
+  overflow: hidden;
+  flex-shrink: 0;
+}
