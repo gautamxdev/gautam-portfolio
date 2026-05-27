@@ -11,6 +11,9 @@ export function SectionLabel({ label }: { label: string }) {
   const [displayText, setDisplayText] = useState("");
   const [done, setDone] = useState(false);
 
+  const hasTrailingUnderscore = label.endsWith("_");
+  const baseLabel = hasTrailingUnderscore ? label.slice(0, -1) : label;
+
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
@@ -33,22 +36,22 @@ export function SectionLabel({ label }: { label: string }) {
   useEffect(() => {
     if (!started || done) return;
 
-    if (displayText.length >= label.length) {
+    if (displayText.length >= baseLabel.length) {
       setDone(true);
       return;
     }
 
     const timer = window.setTimeout(() => {
-      setDisplayText(label.slice(0, displayText.length + 1));
+      setDisplayText(baseLabel.slice(0, displayText.length + 1));
     }, CHAR_DELAY);
 
     return () => window.clearTimeout(timer);
-  }, [started, displayText, label, done]);
+  }, [started, displayText, baseLabel, done]);
 
   return (
     <p ref={ref} className="section-label min-h-[1.2em] whitespace-nowrap">
       {displayText}
-      {started && !done && (
+      {started && (hasTrailingUnderscore || !done) && (
         <span className="section-label-cursor" aria-hidden="true">
           _
         </span>

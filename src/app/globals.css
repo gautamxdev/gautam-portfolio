@@ -127,6 +127,9 @@
   .section-label-cursor {
     color: var(--accent);
     font-weight: 400;
+    font-size: 0.8em;
+    vertical-align: baseline;
+    margin-left: 2px;
     animation: cursor-blink 600ms step-end infinite;
   }
 

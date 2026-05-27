@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import "./HeroArt.css";
 
 const GLITCH_MS = 60;
@@ -206,10 +207,13 @@ export function HeroArt() {
           <div
             className={`hero-art-stack${glitching ? " hero-art-stack--glitch" : ""}`}
           >
-            <img
+            <Image
               ref={imgRef}
               src="/hero-art.webp"
               alt="hero"
+              width={480}
+              height={480}
+              priority
               className="hero-art-image"
             />
             <div className="hero-art-scanlines" aria-hidden="true" />
