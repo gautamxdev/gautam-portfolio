@@ -1,7 +1,7 @@
 export const navLinks = [
-  { label: "About", href: "#about" },
-  { label: "Skills", href: "#skills" },
+  { label: "About Me", href: "#skills" },
   { label: "Projects", href: "#projects" },
+  { label: "Brewing", href: "#currently-brewing" },
   { label: "Contact", href: "#contact" },
 ] as const;
 
@@ -37,38 +37,45 @@ export type Project = {
   stack: string[];
   liveUrl?: string;
   repoUrl?: string;
+  image?: string;
 };
 
 export const projects: Project[] = [
   {
-    name: "DevFlow",
+    name: "Sub-Agents Directory",
     description:
-      "A lightweight project management tool for indie developers and small teams.",
-    stack: ["Next.js", "TypeScript", "PostgreSQL", "Prisma"],
+      "Curated collection of Claude Code sub-agent prompts and MCP servers. Discover sub-agents, prompts and more.",
+    stack: ["Next.js", "Tailwind CSS"],
     liveUrl: "#",
-    repoUrl: "#",
+    repoUrl: "https://github.com/gautamxdev/sub-agents-directory",
+    image: "/project-sub-agents.png",
   },
   {
-    name: "ScrapeKit",
+    name: "Codejeet",
     description:
-      "Open-source scraping utilities with rate limiting and proxy rotation built in.",
-    stack: ["Python", "FastAPI", "Redis", "Docker"],
-    repoUrl: "#",
-  },
-  {
-    name: "Pulse Dashboard",
-    description:
-      "Real-time analytics dashboard for monitoring web app performance metrics.",
-    stack: ["React", "Node.js", "WebSockets", "Chart.js"],
+      "System Design and DSA learning platform with 17,000+ company-wise LeetCode questions scraped via Selenium and pSEO blogs. Serving 345K+ monthly pageviews.",
+    stack: ["Next.js", "TypeScript", "Selenium", "Tailwind CSS"],
     liveUrl: "#",
-    repoUrl: "#",
+    repoUrl: "https://github.com/gautamxdev/codejeet",
+    image: "/project-codejeet.png",
   },
   {
-    name: "CLI Notes",
+    name: "DevShorts",
     description:
-      "Terminal-first note-taking app with markdown support and fuzzy search.",
-    stack: ["Rust", "SQLite", "TUI"],
-    repoUrl: "#",
+      "Automated short-form video generator that combines coding screencasts with engaging gaming clips and captions to boost developer engagement.",
+    stack: ["React", "TypeScript", "FFmpeg", "Tailwind CSS"],
+    liveUrl: "#",
+    repoUrl: "https://github.com/gautamxdev/devshorts",
+    image: "/project-devshorts.png",
+  },
+  {
+    name: "TrendTrader",
+    description:
+      "Social trend analysis and prediction platform that maps social media engagement peaks directly to tradeable crypto assets.",
+    stack: ["Next.js", "Python", "FastAPI", "Tailwind CSS"],
+    liveUrl: "#",
+    repoUrl: "https://github.com/gautamxdev/trendtrader",
+    image: "/project-trendtrader.png",
   },
 ];
 
@@ -91,3 +98,30 @@ export const socialLinks = [
 ] as const;
 
 export const email = "shettygautam955@gmail.com";
+
+export type BrewingCompany = {
+  name: string;
+  status: "in progress" | "beta" | "alpha" | string;
+  description: string;
+  stack: string[];
+  link?: string;
+};
+
+export const brewingCompanies: BrewingCompany[] = [
+  {
+    name: "Reddmark",
+    status: "in progress",
+    description:
+      "Turn Your Saved Reddit Posts Into a Personal AI Knowledge Base. Reddit's save button captures knowledge — Reddmark helps you find, understand, and reuse it instead of letting it become a graveyard.",
+    stack: ["Next.js", "TypeScript", "AI", "PostgreSQL"],
+    link: "https://reddmark.net/",
+  },
+  {
+    name: "Compliance Flow Sage",
+    status: "beta",
+    description:
+      "A structured workspace for CA firms to run compliance work without chaos. Streamlines audit trails, deadlines, and client workflows in one quiet, organised view.",
+    stack: ["React", "Node.js", "PostgreSQL", "Tailwind CSS"],
+    link: "https://compliance-flow-sage.vercel.app/",
+  },
+];

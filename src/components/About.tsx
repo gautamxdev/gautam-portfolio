@@ -2,7 +2,7 @@ import { SectionLabel } from "@/components/SectionLabel";
 
 export function About() {
   return (
-    <section id="about" className="mx-auto max-w-[900px] px-6 pb-16 pt-8">
+    <section id="about" className="mx-auto max-w-[990px] px-6 pb-16 pt-8">
       <SectionLabel label="about_" />
       <p className="max-w-2xl text-base leading-relaxed text-secondary">
         I&apos;m a software engineer based somewhere on the internet, building

@@ -8,7 +8,7 @@
 .hero-art-wrapper {
   position: relative;
   width: 100%;
-  max-width: 480px;
+  max-width: 400px;
 }
 
 .hero-art-media {
@@ -31,7 +31,7 @@
 .hero-art-image {
   display: block;
   width: 100%;
-  max-width: 480px;
+  max-width: 400px;
   height: auto;
 }
 

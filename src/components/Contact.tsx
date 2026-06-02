@@ -54,7 +54,7 @@ const iconMap = {
 
 export function Contact() {
   return (
-    <section id="contact" className="mx-auto max-w-3xl px-6 py-16">
+    <section id="contact" className="mx-auto max-w-[990px] px-6 py-16">
       <SectionLabel label="contact_" />
       <a
         href={`mailto:${email}`}

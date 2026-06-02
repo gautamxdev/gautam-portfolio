@@ -5,7 +5,7 @@ import "./Hero.css";
 
 export function Hero() {
   return (
-    <section className="mx-auto max-w-[900px] px-6 pb-8 pt-20">
+    <section className="mx-auto max-w-[990px] px-6 pb-8 pt-12">
       <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-8">
         <div className="order-1 flex flex-col justify-center md:order-1">
           <HeroTypewriter />

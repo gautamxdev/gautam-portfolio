@@ -1,5 +1,5 @@
-import { About } from "@/components/About";
 import { Contact } from "@/components/Contact";
+import { CurrentlyBrewing } from "@/components/CurrentlyBrewing";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { Navbar } from "@/components/Navbar";
@@ -16,11 +16,11 @@ export default function Home() {
       <main>
         <Hero />
         <SectionDivider />
-        <About />
-        <SectionDivider />
         <Skills />
         <SectionDivider />
         <Projects />
+        <SectionDivider />
+        <CurrentlyBrewing />
         <SectionDivider />
         <Contact />
       </main>

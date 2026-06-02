@@ -5,8 +5,8 @@ import { SkillsMarquee } from "@/components/SkillsMarquee";
 
 export function Skills() {
   return (
-    <section id="skills" className="mx-auto max-w-3xl px-6 py-16">
-      <SectionLabel label="skills_" />
+    <section id="skills" className="mx-auto max-w-[990px] px-6 py-16">
+      <SectionLabel label="about me_" />
       <SkillsMarquee />
       <Suspense fallback={<ContributionsSkeleton />}>
         <GitHubContributions />
