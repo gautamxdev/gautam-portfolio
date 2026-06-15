@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { SectionLabel } from "@/components/SectionLabel";
 import { email, socialLinks } from "@/data/site";
 
@@ -52,32 +55,185 @@ const iconMap = {
   twitter: TwitterIcon,
 } as const;
 
+type FormState = {
+  name: string;
+  phone: string;
+  email: string;
+  message: string;
+};
+
 export function Contact() {
+  const [form, setForm] = useState<FormState>({
+    name: "",
+    phone: "",
+    email: "",
+    message: "",
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    // Open mailto with prefilled body
+    const subject = encodeURIComponent(
+      `Portfolio Contact from ${form.name || "Visitor"}`
+    );
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nPhone: ${form.phone}\nEmail: ${form.email}\n\nMessage:\n${form.message}`
+    );
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+    setSubmitted(true);
+  }
+
   return (
     <section id="contact" className="mx-auto max-w-[990px] px-6 py-16">
       <SectionLabel label="contact_" />
-      <a
-        href={`mailto:${email}`}
-        className="link-hover font-mono text-base text-foreground"
-      >
-        {email}
-      </a>
-      <div className="mt-6 flex items-center gap-5">
-        {socialLinks.map((link) => {
-          const Icon = iconMap[link.icon];
-          return (
+
+      <div className="mt-2 grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
+        {/* Left column */}
+        <div className="flex flex-col justify-start">
+          <h2 className="font-mono text-2xl font-semibold text-foreground">
+            Get in Touch
+          </h2>
+          <p className="mt-4 font-mono text-sm leading-relaxed text-secondary">
+            If you have any inquiries, please feel free to reach out. You can
+            contact me via email at{" "}
             <a
-              key={link.label}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={link.label}
-              className="text-muted transition-colors duration-200 ease-in-out hover:text-accent-hover"
+              href={`mailto:${email}`}
+              className="link-hover font-semibold text-foreground"
             >
-              <Icon />
+              {email}
             </a>
-          );
-        })}
+          </p>
+
+          <div className="mt-8">
+            <div className="flex items-center gap-5">
+              {socialLinks.map((link) => {
+                const Icon = iconMap[link.icon];
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={link.label}
+                    className="text-muted transition-colors duration-200 ease-in-out hover:text-accent-hover"
+                  >
+                    <Icon />
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Right column — contact form */}
+        <div>
+          {submitted ? (
+            <div className="flex h-full flex-col items-start justify-center gap-3 font-mono">
+              <p className="text-accent text-lg">Message sent_</p>
+              <p className="text-sm text-secondary">
+                Your email client should have opened. I&apos;ll get back to you
+                soon.
+              </p>
+              <button
+                onClick={() => setSubmitted(false)}
+                className="contact-submit-btn mt-2"
+              >
+                Send another
+              </button>
+            </div>
+          ) : (
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col gap-3"
+              noValidate
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="contact-name"
+                    className="sr-only"
+                  >
+                    Full Name
+                  </label>
+                  <input
+                    id="contact-name"
+                    name="name"
+                    type="text"
+                    placeholder="Full Name"
+                    value={form.name}
+                    onChange={handleChange}
+                    className="contact-input"
+                    autoComplete="name"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="contact-phone"
+                    className="sr-only"
+                  >
+                    Phone No
+                  </label>
+                  <input
+                    id="contact-phone"
+                    name="phone"
+                    type="tel"
+                    placeholder="Phone No"
+                    value={form.phone}
+                    onChange={handleChange}
+                    className="contact-input"
+                    autoComplete="tel"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label htmlFor="contact-email" className="sr-only">
+                  Email
+                </label>
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  placeholder="Email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="contact-input"
+                  autoComplete="email"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label htmlFor="contact-message" className="sr-only">
+                  Message
+                </label>
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  placeholder="Message"
+                  value={form.message}
+                  onChange={handleChange}
+                  rows={5}
+                  className="contact-input resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                id="contact-submit"
+                className="contact-submit-btn mt-1"
+              >
+                Submit
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </section>
   );

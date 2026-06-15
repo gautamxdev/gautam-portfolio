@@ -316,6 +316,67 @@
   .marquee-fade:hover .marquee-track {
     animation-play-state: running;
   }
+
+  /* ── Contact section ───────────────────────────────────────── */
+
+  .contact-input {
+    @apply w-full rounded-none bg-elevated font-mono text-sm text-foreground outline-none;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid var(--border);
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+
+  .contact-input::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+  }
+
+  .contact-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 0 8px var(--accent-glow);
+  }
+
+  .contact-submit-btn {
+    @apply w-full rounded-none font-mono text-sm font-medium tracking-widest uppercase;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(
+      135deg,
+      var(--accent) 0%,
+      var(--accent-hover) 100%
+    );
+    color: #000;
+    border: none;
+    cursor: pointer;
+    transition: opacity 200ms ease, box-shadow 200ms ease,
+      transform 120ms ease;
+  }
+
+  .contact-submit-btn:hover {
+    opacity: 0.92;
+    box-shadow: 0 0 18px var(--accent-glow), 0 2px 12px rgba(255, 77, 0, 0.25);
+    transform: translateY(-1px);
+  }
+
+  .contact-submit-btn:active {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .contact-social-btn {
+    @apply flex items-center justify-center rounded-none text-muted;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--border);
+    transition: color 200ms ease, border-color 200ms ease,
+      box-shadow 200ms ease, transform 120ms ease;
+  }
+
+  .contact-social-btn:hover {
+    color: var(--accent-hover);
+    border-color: var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow);
+    transform: translateY(-2px);
+  }
 }
 
 @keyframes live-blink {
