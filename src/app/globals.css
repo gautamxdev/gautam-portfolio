@@ -201,18 +201,24 @@
   .contribution-card {
     --contribution-cell-size: clamp(5px, calc((100vw - 6.25rem) / 60), 10px);
     --contribution-gap: clamp(1px, 0.35vw, 3px);
-    @apply mt-10 w-full overflow-hidden font-mono text-foreground;
+    --contribution-width: calc(53 * var(--contribution-cell-size) + 52 * var(--contribution-gap));
+    @apply mt-10 w-full overflow-hidden font-mono text-muted;
+  }
+
+  .contribution-frame {
+    width: min(100%, var(--contribution-width));
+    max-width: 100%;
+    margin-inline: auto;
   }
 
   .contribution-months {
     position: relative;
     height: 1.75rem;
-    width: calc(53 * var(--contribution-cell-size) + 52 * var(--contribution-gap));
+    width: var(--contribution-width);
     max-width: 100%;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     font-size: clamp(0.55rem, 2.25vw, 0.95rem);
     line-height: 1;
-    @apply font-mono;
   }
 
   .contribution-months span {
@@ -223,6 +229,7 @@
 
   .contribution-grid {
     display: inline-flex;
+    width: var(--contribution-width);
     max-width: 100%;
     gap: var(--contribution-gap);
   }
@@ -241,8 +248,26 @@
     background-color: #161616;
   }
 
+  .contribution-cell[data-level="1"] {
+    background-color: #3d1705;
+  }
+
+  .contribution-cell[data-level="2"] {
+    background-color: #702602;
+  }
+
+  .contribution-cell[data-level="3"] {
+    background-color: #b83c02;
+  }
+
+  .contribution-cell[data-level="4"] {
+    background-color: var(--accent);
+  }
+
   .contribution-footer {
-    @apply mt-4 flex flex-wrap items-center justify-between gap-3 text-muted font-mono text-xs sm:text-sm;
+    width: var(--contribution-width);
+    max-width: 100%;
+    @apply mt-4 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm;
   }
 
   .contribution-legend {

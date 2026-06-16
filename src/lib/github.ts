@@ -20,18 +20,6 @@ type ApiResponse = {
   contributions?: ContributionDay[];
 };
 
-const LEVEL_COLORS: Record<number, string> = {
-  0: "#161616",
-  1: "#3d1705",
-  2: "#702602",
-  3: "#b83c02",
-  4: "#ff4d00",
-};
-
-export function getContributionColor(level: number): string {
-  return LEVEL_COLORS[level] ?? LEVEL_COLORS[0];
-}
-
 function contributionsToWeeks(contributions: ContributionDay[]): ContributionDay[][] {
   if (contributions.length === 0) return [];
 
