@@ -5,6 +5,22 @@ import {
 
 const LEGEND_LEVELS = [0, 1, 2, 3, 4];
 
+function formatContributionLabel(count: number, date: string): string {
+  const parsed = new Date(`${date}T00:00:00Z`);
+  const formatted = parsed.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+
+  if (count === 0) {
+    return `No contributions on ${formatted}.`;
+  }
+
+  const noun = count === 1 ? "contribution" : "contributions";
+  return `${count} ${noun} on ${formatted}.`;
+}
+
 export function ContributionsSkeleton() {
   return (
     <div className="contribution-card animate-pulse">
@@ -37,7 +53,6 @@ function ContributionsError() {
 function ContributionsGrid({
   total,
   weeks,
-  year,
   monthLabels,
 }: ContributionsData) {
   return (
@@ -58,7 +73,7 @@ function ContributionsGrid({
         <div
           className="contribution-grid"
           role="img"
-          aria-label={`${total} GitHub contributions in ${year}`}
+          aria-label={`${total} GitHub contributions in the last year`}
         >
           {weeks.map((week, weekIndex) => (
             <div key={weekIndex} className="contribution-week">
@@ -67,7 +82,7 @@ function ContributionsGrid({
                   key={`${weekIndex}-${dayIndex}`}
                   title={
                     day.date
-                      ? `${day.count} contribution${day.count === 1 ? "" : "s"} on ${day.date}`
+                      ? formatContributionLabel(day.count, day.date)
                       : undefined
                   }
                   className="contribution-cell"
@@ -78,7 +93,7 @@ function ContributionsGrid({
           ))}
         </div>
         <div className="contribution-footer">
-          <p>{total.toLocaleString()} contributions in {year}</p>
+          <p>{total.toLocaleString()} contributions in the last year</p>
           <div className="contribution-legend" aria-hidden="true">
             <span>Less</span>
             <div className="flex gap-2">

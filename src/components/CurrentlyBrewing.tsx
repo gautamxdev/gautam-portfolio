@@ -18,7 +18,10 @@ export function CurrentlyBrewing() {
               <div className="project-row flex-1">
                 <div className="flex flex-wrap items-center gap-3">
                   <h3 className="project-name-glow">{company.name}</h3>
-                  <span className="rounded-full border border-border bg-surface px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent">
+                  <span className="status-badge rounded-full border border-border bg-surface px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent">
+                    {company.status.toLowerCase() === "live" && (
+                      <span className="live-dot" aria-hidden="true" />
+                    )}
                     {company.status}
                   </span>
                 </div>

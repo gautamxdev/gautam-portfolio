@@ -110,10 +110,10 @@ export type BrewingCompany = {
 export const brewingCompanies: BrewingCompany[] = [
   {
     name: "Reddmark",
-    status: "in progress",
+    status: "Live",
     description:
-      "Turn Your Saved Reddit Posts Into a Personal AI Knowledge Base. Reddit's save button captures knowledge — Reddmark helps you find, understand, and reuse it instead of letting it become a graveyard.",
-    stack: ["Next.js", "TypeScript", "AI", "PostgreSQL"],
+      "Software, built and shipped. A studio for founders who need it done. I build MVPs, websites, and automation systems end-to-end for growing businesses, from idea to production.",
+    stack: ["MVPs", "Websites", "Automation", "WhatsApp Systems"],
     link: "https://reddmark.net/",
   },
   {
