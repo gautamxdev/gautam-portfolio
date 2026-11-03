@@ -1,7 +1,9 @@
 export function Footer() {
   return (
-    <footer className="mx-auto max-w-[990px] border-t border-border px-6 py-8">
-      <p className="text-sm text-muted">© 2026 Gautam Alva</p>
+    <footer className="site-footer shell mono">
+      <span>© {new Date().getFullYear()} GAUTAM ALVA</span>
+      <span>BUILT WITH INTENT. AND A FEW LATE NIGHTS.</span>
+      <a href="#top">BACK TO TOP ↑</a>
     </footer>
   );
 }

@@ -1,42 +1,61 @@
 import { HeroArt } from "@/components/HeroArt";
-import { HeroTypewriter } from "@/components/HeroTypewriter";
-import { email } from "@/data/site";
-import "./Hero.css";
 
 export function Hero() {
   return (
-    <section className="mx-auto max-w-[990px] px-6 pb-8 pt-12">
-      <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-8">
-        <div className="order-1 flex flex-col justify-center md:order-1">
-          <HeroTypewriter />
-          <p className="mt-4 font-mono text-lg text-muted">
-            I build things for the web.
+    <section className="hero shell" aria-labelledby="hero-title">
+      <div className="hero-intro">
+        <span className="eyebrow">
+          <span className="status-light" /> AVAILABLE FOR INTERESTING WORK
+        </span>
+        <span className="hero-index mono">PORTFOLIO / 2026</span>
+      </div>
+      <div className="hero-grid">
+        <div className="hero-copy">
+          <p className="hero-name mono">
+            HEY, I’M GAUTAM ALVA <span aria-hidden="true">↴</span>
           </p>
-          <div className="mt-8 max-w-xl space-y-4 text-base leading-relaxed text-secondary">
-            <p>
-              Full-stack developer who ships. I care about clean interfaces, fast
-              systems, and products people actually want to use.
-            </p>
-            <p>
-              Currently exploring developer tools, automation, and anything that
-              makes builders more productive.
-            </p>
-            <p className="text-sm text-accent">
-              Open to full-time roles, freelance, and interesting collabs.
-            </p>
+          <h1 id="hero-title">
+            A little human.
+            <br />A lot of{" "}
+            <span className="code-word">
+              code<span className="code-period">.</span>
+              <svg viewBox="0 0 300 16" aria-hidden="true">
+                <path d="M3 11C69 3 181 2 296 7M54 14C139 7 230 8 278 11" />
+              </svg>
+            </span>
+          </h1>
+          <p className="hero-description">
+            I build useful software with a curious mind
+            <br className="desktop-break" /> and an unreasonable attention to
+            detail.
+          </p>
+          <div className="hero-actions">
+            <a className="button button-primary" href="#projects">
+              Explore my work <span aria-hidden="true">↗</span>
+            </a>
+            <a
+              className="text-link"
+              href="https://github.com/gautamxdev"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub <span aria-hidden="true">↗</span>
+            </a>
           </div>
-          <a
-            href={`mailto:${email}`}
-            className="link-hover group mt-10 inline-block font-mono text-sm text-accent"
-          >
-            <span className="group-hover:hidden">Let&apos;s talk →</span>
-            <span className="hidden group-hover:inline">{email}</span>
-          </a>
+          <p className="hero-caption mono">
+            <span aria-hidden="true">↳</span> FULL-STACK ENGINEER. BUILDER AT
+            REDDMARK.
+          </p>
         </div>
-
-        <div className="order-2 flex w-full items-center justify-center md:order-2">
+        <div className="hero-installation">
           <HeroArt />
         </div>
+      </div>
+      <div className="hero-bottom">
+        <span className="mono">GOOD SOFTWARE STARTS WITH CURIOSITY.</span>
+        <a href="#projects" className="scroll-cue mono">
+          SCROLL TO EXPLORE <span aria-hidden="true">↓</span>
+        </a>
       </div>
     </section>
   );

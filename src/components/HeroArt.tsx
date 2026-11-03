@@ -1,242 +1,530 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import "./HeroArt.css";
 
-const GLITCH_MS = 60;
-const CELL = 2;
-const FRAME_MS = 120;
-const PULSE_PEAK = 0.08;
-const PULSE_DURATION = 600;
+type Particle = {
+  x: number;
+  y: number;
+  homeX: number;
+  homeY: number;
+  vx: number;
+  vy: number;
+  alpha: number;
+  seed: number;
+};
 
-function randomGlitchDelay(): number {
-  return 8000 + Math.random() * 4000;
-}
+type ArtEngine = {
+  compile: () => void;
+  setOutputVisible: (visible: boolean) => void;
+};
 
-function randomPulseDelay(): number {
-  return 12000 + Math.random() * 6000;
-}
+const SOURCE_LINES = [
+  { text: "// A little physics. A human connection.", kind: "comment" },
+  { text: "const dx = particle.x - pointer.x;", kind: "code" },
+  { text: "const dy = particle.y - pointer.y;", kind: "code" },
+  { text: "const distance = Math.hypot(dx, dy);", kind: "code" },
+  { text: "const force = Math.max(0,", kind: "code" },
+  { text: "  1 - distance / radius);", kind: "code" },
+  { text: "", kind: "code" },
+  { text: "// Every point remembers where it belongs.", kind: "comment" },
+  { text: "particle.vx += (particle.homeX", kind: "code" },
+  { text: "  - particle.x) * 0.035;", kind: "code" },
+  { text: "particle.vx *= 0.87;", kind: "code" },
+  { text: "particle.x += particle.vx;", kind: "code" },
+] as const;
 
 export function HeroArt() {
-  const imgRef = useRef<HTMLImageElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [glitching, setGlitching] = useState(false);
+  const engineRef = useRef<ArtEngine | null>(null);
+  const [view, setView] = useState<"output" | "source">("output");
+  const [ready, setReady] = useState(false);
+  const [building, setBuilding] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
 
   useEffect(() => {
-    let cancelled = false;
-    const timeouts: number[] = [];
-
-    const schedule = (fn: () => void, ms: number) => {
-      const id = window.setTimeout(() => {
-        if (!cancelled) fn();
-      }, ms);
-      timeouts.push(id);
-    };
-
-    const runGlitch = () => {
-      if (cancelled) return;
-
-      setGlitching(true);
-      schedule(() => {
-        setGlitching(false);
-        schedule(runGlitch, randomGlitchDelay());
-      }, GLITCH_MS);
-    };
-
-    schedule(runGlitch, randomGlitchDelay());
-
-    return () => {
-      cancelled = true;
-      timeouts.forEach((id) => window.clearTimeout(id));
-    };
-  }, []);
-
-  useEffect(() => {
-    const img = imgRef.current;
+    const stage = stageRef.current;
     const canvas = canvasRef.current;
-    if (!img || !canvas) return;
+    if (!stage || !canvas) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const context = canvas.getContext("2d", { alpha: true });
+    if (!context) return;
 
-    let cancelled = false;
-    let frameTimeout = 0;
-    let pulseTimeout = 0;
-    let pulseStage: "up" | "hold" | "down" | null = null;
-    let pulseStageStart = 0;
-    let currentZone = 0;
-    let lastZoneChange = Date.now();
-    const pulseTimeouts: number[] = [];
+    const source = new window.Image();
+    const motionPreference = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+    const pointer = { x: -1000, y: -1000, active: false };
+    let particles: Particle[] = [];
+    let width = 0;
+    let height = 0;
+    let frame = 0;
+    let lastFrame = 0;
+    let activeUntil = 0;
+    let buildStarted = -1;
+    let visible = true;
+    let outputVisible = true;
+    let loaded = false;
+    let disposed = false;
+    let reducedMotion = motionPreference.matches;
+
+    const stop = () => {
+      window.cancelAnimationFrame(frame);
+      frame = 0;
+      lastFrame = 0;
+    };
+
+    const settle = () => {
+      pointer.active = false;
+      activeUntil = 0;
+      for (const particle of particles) {
+        particle.x = particle.homeX;
+        particle.y = particle.homeY;
+        particle.vx = 0;
+        particle.vy = 0;
+      }
+    };
+
+    const paint = (now: number) => {
+      context.clearRect(0, 0, width, height);
+      const buildingNow = buildStarted >= 0 && now - buildStarted < 1800;
+      const radius = Math.max(48, Math.min(95, width * 0.16));
+      let unsettled = false;
+
+      for (const particle of particles) {
+        const dx = particle.x - pointer.x;
+        const dy = particle.y - pointer.y;
+        const distance = Math.hypot(dx, dy);
+        const force =
+          pointer.active && !reducedMotion
+            ? Math.max(0, 1 - distance / radius)
+            : 0;
+
+        if (force > 0) {
+          particle.vx += (dx / Math.max(distance, 1)) * force * 2;
+          particle.vy += (dy / Math.max(distance, 1)) * force * 2;
+        }
+
+        if (!reducedMotion) {
+          particle.vx += (particle.homeX - particle.x) * 0.035;
+          particle.vy += (particle.homeY - particle.y) * 0.035;
+          particle.vx *= 0.87;
+          particle.vy *= 0.87;
+          particle.x += particle.vx;
+          particle.y += particle.vy;
+          if (Math.abs(particle.vx) + Math.abs(particle.vy) > 0.06)
+            unsettled = true;
+        }
+
+        const accent = force > 0.1 || (buildingNow && particle.seed % 7 === 0);
+        context.fillStyle = accent ? "#ff5c28" : "#f1eee7";
+        context.globalAlpha = Math.min(1, particle.alpha + force * 0.45);
+
+        if (accent && particle.seed % 19 === 0) {
+          context.font = "8px monospace";
+          context.fillText(
+            particle.seed % 2 ? "+" : "·",
+            particle.x,
+            particle.y,
+          );
+        } else {
+          const size = width < 400 ? 1.25 : 1.5;
+          context.fillRect(particle.x, particle.y, size, size);
+        }
+      }
+      context.globalAlpha = 1;
+
+      if (buildStarted >= 0 && !buildingNow) {
+        buildStarted = -1;
+        setBuilding(false);
+        setAnnouncement("Build complete. The hands are reassembled.");
+      }
+      return unsettled || buildingNow;
+    };
+
+    const tick = (now: number) => {
+      frame = 0;
+      if (disposed || !visible || !outputVisible || document.hidden) return;
+      // Limit the physics to 60 Hz on high-refresh displays.
+      if (lastFrame && now - lastFrame < 15) {
+        frame = window.requestAnimationFrame(tick);
+        return;
+      }
+      lastFrame = now;
+      const unsettled = paint(now);
+      if (!reducedMotion && (unsettled || now < activeUntil)) {
+        frame = window.requestAnimationFrame(tick);
+      } else {
+        lastFrame = 0;
+      }
+    };
+
+    const wake = () => {
+      if (
+        !frame &&
+        loaded &&
+        visible &&
+        outputVisible &&
+        !document.hidden &&
+        !disposed
+      ) {
+        frame = window.requestAnimationFrame(tick);
+      }
+    };
 
     const resize = () => {
-      canvas.width = img.offsetWidth;
-      canvas.height = img.offsetHeight;
-    };
+      if (!loaded || disposed) return;
+      width = stage.clientWidth;
+      height = stage.clientHeight;
+      if (!width || !height) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const getCellZone = (
-      x: number,
-      y: number,
-      width: number,
-      height: number,
-    ) => {
-      const col = Math.min(2, Math.floor((x / width) * 3));
-      const row = Math.min(2, Math.floor((y / height) * 3));
-      return row * 3 + col;
-    };
+      const sample = document.createElement("canvas");
+      const sampleWidth = Math.min(560, Math.round(width));
+      sample.width = sampleWidth;
+      sample.height = Math.round(sampleWidth * (310 / 736));
+      const sampleContext = sample.getContext("2d", {
+        willReadFrequently: true,
+      });
+      if (!sampleContext) return;
+      sampleContext.drawImage(
+        source,
+        0,
+        245,
+        736,
+        310,
+        0,
+        0,
+        sample.width,
+        sample.height,
+      );
 
-    const getBaseThreshold = (now: number) =>
-      0.02 + Math.sin(now * 0.0003) * 0.01;
-
-    const getPulseLevel = (now: number) => {
-      if (!pulseStage) return 0;
-
-      const elapsed = now - pulseStageStart;
-
-      if (pulseStage === "up") {
-        return Math.min(1, elapsed / 200);
-      }
-      if (pulseStage === "hold") {
-        return 1;
-      }
-      return Math.max(0, 1 - elapsed / 200);
-    };
-
-    const getThreshold = (now: number) => {
-      const base = getBaseThreshold(now);
-      const level = getPulseLevel(now);
-
-      if (level > 0) {
-        return base + (PULSE_PEAK - base) * level;
-      }
-
-      return base;
-    };
-
-    const schedulePulse = () => {
-      pulseTimeout = window.setTimeout(() => {
-        if (cancelled) return;
-
-        pulseStage = "up";
-        pulseStageStart = Date.now();
-
-        pulseTimeouts.push(
-          window.setTimeout(() => {
-            if (cancelled) return;
-            pulseStage = "hold";
-            pulseStageStart = Date.now();
-          }, 200),
+      try {
+        const pixels = sampleContext.getImageData(
+          0,
+          0,
+          sample.width,
+          sample.height,
+        ).data;
+        const displayWidth = width * 1.13;
+        const displayHeight = displayWidth * (310 / 736);
+        const offsetX = (width - displayWidth) / 2;
+        const offsetY = height * 0.48 - displayHeight / 2;
+        const brightnessAt = (column: number, row: number) => {
+          const clampedX = Math.max(0, Math.min(sample.width - 1, column));
+          const clampedY = Math.max(0, Math.min(sample.height - 1, row));
+          const index = (clampedY * sample.width + clampedX) * 4;
+          return (pixels[index] + pixels[index + 1] + pixels[index + 2]) / 3;
+        };
+        // Include the downsampling footprint around the bitmap's antialiased edges.
+        const edgePadding = (736 / sample.width) * 1.5;
+        const neighborOffset = Math.ceil(
+          ((7 + edgePadding) * sample.width) / 736,
         );
-
-        pulseTimeouts.push(
-          window.setTimeout(() => {
-            if (cancelled) return;
-            pulseStage = "down";
-            pulseStageStart = Date.now();
-          }, 400),
-        );
-
-        pulseTimeouts.push(
-          window.setTimeout(() => {
-            if (cancelled) return;
-            pulseStage = null;
-            schedulePulse();
-          }, PULSE_DURATION),
-        );
-      }, randomPulseDelay());
-    };
-
-    const drawFrame = () => {
-      if (cancelled) return;
-
-      const { width, height } = canvas;
-      if (width > 0 && height > 0) {
-        ctx.clearRect(0, 0, width, height);
-        ctx.fillStyle = "#080808";
-
-        const now = Date.now();
-        if (now - lastZoneChange >= 800) {
-          currentZone = (currentZone + 1) % 9;
-          lastZoneChange = now;
-        }
-
-        const threshold = getThreshold(now);
-
-        for (let y = 0; y < height; y += CELL) {
-          for (let x = 0; x < width; x += CELL) {
-            if (Math.random() >= threshold) continue;
-
-            const cellZone = getCellZone(x, y, width, height);
-            const biasCurrent = Math.random() < 0.7;
-
-            if (biasCurrent && cellZone === currentZone) {
-              ctx.fillRect(x, y, CELL, CELL);
-            } else if (!biasCurrent && cellZone !== currentZone) {
-              ctx.fillRect(x, y, CELL, CELL);
+        particles = [];
+        for (let y = 0; y < sample.height; y += 2) {
+          for (let x = 0; x < sample.width; x += 2) {
+            let brightness = brightnessAt(x, y);
+            const sourceX = (x / sample.width) * 736;
+            const sourceY = 245 + (y / sample.height) * 310;
+            // Remove the old window chrome without cutting lines through the hands.
+            const withinWindow =
+              sourceX >= 272 - edgePadding && sourceX <= 499 + edgePadding;
+            const oldHeader =
+              withinWindow &&
+              sourceY >= 285 - edgePadding &&
+              sourceY <= 303 + edgePadding;
+            const oldSides =
+              ((sourceX >= 272 - edgePadding && sourceX <= 276 + edgePadding) ||
+                (sourceX >= 495 - edgePadding &&
+                  sourceX <= 498 + edgePadding)) &&
+              sourceY >= 285 - edgePadding &&
+              sourceY <= 451 + edgePadding;
+            const oldBottom =
+              withinWindow &&
+              sourceY >= 445 - edgePadding &&
+              sourceY <= 451 + edgePadding;
+            if (oldHeader) continue;
+            if (oldSides) {
+              brightness = Math.min(
+                brightnessAt(x - neighborOffset, y),
+                brightnessAt(x + neighborOffset, y),
+              );
             }
+            if (oldBottom) {
+              brightness = Math.min(
+                brightness,
+                brightnessAt(x, y - neighborOffset),
+                brightnessAt(x, y + neighborOffset),
+              );
+            }
+            if (brightness < 48) continue;
+
+            const homeX = offsetX + (x / sample.width) * displayWidth;
+            const homeY = offsetY + (y / sample.height) * displayHeight;
+            particles.push({
+              x: homeX,
+              y: homeY,
+              homeX,
+              homeY,
+              vx: 0,
+              vy: 0,
+              alpha: Math.max(0.28, brightness / 255),
+              seed: x * 31 + y * 17,
+            });
           }
         }
+        paint(performance.now());
+        setReady(true);
+        wake();
+      } catch {
+        // Keep the original image visible if pixel sampling is unavailable.
+        setReady(false);
       }
-
-      frameTimeout = window.setTimeout(drawFrame, FRAME_MS);
     };
 
-    img.addEventListener("load", resize);
-    resize();
+    const compile = () => {
+      if (!loaded) return;
+      pointer.active = false;
+      if (reducedMotion) {
+        settle();
+        paint(performance.now());
+        setAnnouncement("Build complete. Reduced motion is enabled.");
+        setBuilding(false);
+        return;
+      }
+      const now = performance.now();
+      buildStarted = now;
+      activeUntil = now + 2000;
+      setBuilding(true);
+      setAnnouncement("Rebuilding the connection.");
+      for (const particle of particles) {
+        const angle = particle.seed * 2.39996;
+        const power = 3 + (particle.seed % 13);
+        particle.x = particle.homeX + Math.cos(angle) * width * 0.18;
+        particle.y = particle.homeY + Math.sin(angle) * height * 0.32;
+        particle.vx = Math.cos(angle) * power;
+        particle.vy = Math.sin(angle) * power;
+      }
+      wake();
+    };
 
-    const observer = new ResizeObserver(resize);
-    observer.observe(img);
+    const onPointerMove = (event: PointerEvent) => {
+      if (event.pointerType === "touch" || reducedMotion || !outputVisible)
+        return;
+      const bounds = stage.getBoundingClientRect();
+      pointer.x = event.clientX - bounds.left;
+      pointer.y = event.clientY - bounds.top;
+      pointer.active = true;
+      activeUntil = performance.now() + 1200;
+      wake();
+    };
 
-    schedulePulse();
-    drawFrame();
+    const onPointerLeave = () => {
+      pointer.active = false;
+      activeUntil = performance.now() + 1000;
+      wake();
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden) stop();
+      else wake();
+    };
+
+    const onMotionChange = () => {
+      reducedMotion = motionPreference.matches;
+      if (reducedMotion) {
+        stop();
+        buildStarted = -1;
+        settle();
+        setBuilding(false);
+      }
+      wake();
+    };
+
+    engineRef.current = {
+      compile,
+      setOutputVisible: (nextVisible) => {
+        outputVisible = nextVisible;
+        if (!nextVisible) {
+          stop();
+          settle();
+          if (buildStarted >= 0) {
+            buildStarted = -1;
+            setBuilding(false);
+            setAnnouncement("Source view. The animation has been reset.");
+          }
+        } else {
+          wake();
+        }
+      },
+    };
+
+    source.onload = () => {
+      if (disposed) return;
+      loaded = true;
+      resize();
+    };
+    source.src = "/hero-art.webp";
+    if (source.complete && source.naturalWidth > 0) {
+      loaded = true;
+      resize();
+    }
+
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(stage);
+    const intersectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        if (!visible) stop();
+        else wake();
+      },
+      { threshold: 0.05 },
+    );
+    intersectionObserver.observe(stage);
+    stage.addEventListener("pointermove", onPointerMove);
+    stage.addEventListener("pointerleave", onPointerLeave);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    motionPreference.addEventListener("change", onMotionChange);
 
     return () => {
-      cancelled = true;
-      window.clearTimeout(frameTimeout);
-      window.clearTimeout(pulseTimeout);
-      pulseTimeouts.forEach((id) => window.clearTimeout(id));
-      img.removeEventListener("load", resize);
-      observer.disconnect();
+      disposed = true;
+      stop();
+      source.onload = null;
+      engineRef.current = null;
+      resizeObserver.disconnect();
+      intersectionObserver.disconnect();
+      stage.removeEventListener("pointermove", onPointerMove);
+      stage.removeEventListener("pointerleave", onPointerLeave);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      motionPreference.removeEventListener("change", onMotionChange);
     };
   }, []);
 
-  return (
-    <div className="hero-art-column">
-      <div className="hero-art-wrapper">
-        <div className="hero-art-media">
-          <div
-            className={`hero-art-stack${glitching ? " hero-art-stack--glitch" : ""}`}
-          >
-            <Image
-              ref={imgRef}
-              src="/hero-art.webp"
-              alt="hero"
-              width={480}
-              height={480}
-              priority
-              className="hero-art-image"
-            />
-            <div className="hero-art-scanlines" aria-hidden="true" />
-            <canvas
-              ref={canvasRef}
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                inset: 0,
-                pointerEvents: "none",
-                zIndex: 3,
-                width: "100%",
-                height: "100%",
-              }}
-            />
+  useEffect(() => {
+    engineRef.current?.setOutputVisible(view === "output");
+  }, [view]);
 
-            <span className="hero-art-bracket hero-art-bracket-tl" aria-hidden="true" />
-            <span className="hero-art-bracket hero-art-bracket-tr" aria-hidden="true" />
-            <span className="hero-art-bracket hero-art-bracket-bl" aria-hidden="true" />
-            <span className="hero-art-bracket hero-art-bracket-br" aria-hidden="true" />
-          </div>
+  const runBuild = () => {
+    setView("output");
+    engineRef.current?.setOutputVisible(true);
+    engineRef.current?.compile();
+  };
+
+  return (
+    <figure className={`hands-installation${building ? " is-building" : ""}`}>
+      <div className="hands-toolbar">
+        <span className="hands-file">
+          <span aria-hidden="true">⌘</span> connection.tsx
+        </span>
+        <div className="hands-view-switch" aria-label="Artwork view">
+          <button
+            type="button"
+            aria-pressed={view === "output"}
+            onClick={() => setView("output")}
+          >
+            Output
+          </button>
+          <button
+            type="button"
+            aria-pressed={view === "source"}
+            onClick={() => setView("source")}
+          >
+            Source
+          </button>
         </div>
       </div>
-    </div>
+
+      <div className="hands-stage" ref={stageRef}>
+        <div className="hands-output" hidden={view !== "output"}>
+          <div className="hands-grid" aria-hidden="true" />
+          <span
+            className="hands-coordinate hands-coordinate-top"
+            aria-hidden="true"
+          >
+            FIG. 001 — THE CONNECTION
+          </span>
+          <span className="hands-axis hands-axis-x" aria-hidden="true">
+            x
+          </span>
+          <span className="hands-axis hands-axis-y" aria-hidden="true">
+            y
+          </span>
+          <canvas
+            ref={canvasRef}
+            className={`hands-canvas${ready ? " is-loaded" : ""}`}
+            role="img"
+            aria-hidden={!ready}
+            aria-label="Interactive pointillist hands. Move your pointer through the particles, or use Run build to scatter and reassemble them."
+          />
+          <div className="hands-art-caption" aria-hidden="true">
+            <span>human input</span>
+            <span className="hands-caption-line" />
+            <span>digital output</span>
+          </div>
+          <span className="hands-corner hands-corner-tl" aria-hidden="true" />
+          <span className="hands-corner hands-corner-tr" aria-hidden="true" />
+          <span className="hands-corner hands-corner-bl" aria-hidden="true" />
+          <span className="hands-corner hands-corner-br" aria-hidden="true" />
+        </div>
+
+        <div className="hands-source" hidden={view !== "source"}>
+          <div className="hands-source-label">
+            A glimpse inside the interaction
+          </div>
+          <ol className="hands-source-code">
+            {SOURCE_LINES.map((line, index) => (
+              <li key={index} className={line.kind}>
+                <code>{line.text || " "}</code>
+              </li>
+            ))}
+          </ol>
+          <span className="hands-source-note">
+            Canvas 2D · spring physics · zero animation libraries
+          </span>
+        </div>
+      </div>
+
+      <figcaption className="hands-footer">
+        <span className="hands-hint">
+          <span className="hands-status-dot" aria-hidden="true" />{" "}
+          <span>
+            {building ? (
+              "Rebuilding connection…"
+            ) : view === "source" ? (
+              "Spring physics, in a few lines."
+            ) : (
+              <>
+                <span className="hands-pointer-hint">
+                  Move your cursor. Make a connection.
+                </span>
+                <span className="hands-touch-hint">
+                  Tap Run build to reconnect.
+                </span>
+                <span className="hands-static-hint">
+                  A connection, rendered in code.
+                </span>
+              </>
+            )}
+          </span>
+        </span>
+        <button
+          type="button"
+          className="hands-build"
+          onClick={runBuild}
+          disabled={!ready || building}
+        >
+          <span aria-hidden="true">{building ? "↻" : "▷"}</span>{" "}
+          {building ? "Building" : "Run build"}
+        </button>
+      </figcaption>
+      <span className="sr-only" role="status" aria-live="polite">
+        {announcement}
+      </span>
+    </figure>
   );
 }

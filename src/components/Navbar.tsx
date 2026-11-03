@@ -1,22 +1,32 @@
 import { navLinks } from "@/data/site";
+import { CommandMenu } from "@/components/CommandMenu";
 
 export function Navbar() {
   return (
-    <header className="navbar-glass sticky top-0 z-50">
-      <nav className="mx-auto flex max-w-[990px] items-center justify-between gap-4 px-6 py-4">
-        <a href="#" className="nav-logo shrink-0">
-          <span className="text-accent">~/</span>
-          <span className="text-foreground">gautam.dev</span>
+    <header className="site-header">
+      <nav className="site-nav shell" aria-label="Main navigation">
+        <a
+          href="#top"
+          className="wordmark"
+          aria-label="Gautam Alva, back to top"
+        >
+          <span className="brand-mark" aria-hidden="true">
+            g<span>.</span>
+          </span>
+          <span>
+            gautam<span className="wordmark-muted"> / dev</span>
+          </span>
         </a>
-        <ul className="flex flex-wrap items-center justify-end gap-x-5 gap-y-1">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <a href={link.href} className="link-hover text-sm font-medium text-muted">
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <div className="nav-right">
+          <ul className="nav-links">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+          <CommandMenu />
+        </div>
       </nav>
     </header>
   );
