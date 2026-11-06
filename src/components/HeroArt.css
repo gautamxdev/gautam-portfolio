@@ -138,37 +138,6 @@
 .hands-canvas.is-loaded {
   opacity: 1;
 }
-.hands-art-caption {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  position: absolute;
-  left: 24px;
-  right: 24px;
-  bottom: 34px;
-  color: #868880;
-  font-size: 9px;
-  letter-spacing: 0.04em;
-  pointer-events: none;
-}
-.hands-caption-line {
-  width: 55px;
-  height: 1px;
-  background: #393a35;
-  position: relative;
-}
-.hands-caption-line::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: -2px;
-  width: 5px;
-  height: 5px;
-  border-top: 1px solid #686c60;
-  border-right: 1px solid #686c60;
-  transform: rotate(45deg);
-}
 .hands-corner {
   position: absolute;
   width: 7px;
@@ -202,8 +171,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 57px;
-  padding: 12px 17px;
+  min-height: 52px;
+  padding: 10px 8px 10px 13px;
   border-top: 1px solid #242525;
   background: #101111;
 }

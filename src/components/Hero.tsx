@@ -7,7 +7,6 @@ export function Hero() {
         <span className="eyebrow">
           <span className="status-light" /> AVAILABLE FOR INTERESTING WORK
         </span>
-        <span className="hero-index mono">PORTFOLIO / 2026</span>
       </div>
       <div className="hero-grid">
         <div className="hero-copy">

@@ -1,4 +1,4 @@
-import { projects, type Project } from "@/data/site";
+import { projects, type Project } from "@/data/projects";
 
 function ProjectLinks({ project }: { project: Project }) {
   return (
@@ -184,7 +184,7 @@ export function Projects() {
         </div>
       </article>
       <div className="project-grid">
-        {rest.slice(0, 2).map((project) => (
+        {rest.map((project) => (
           <article className="project-card" key={project.id}>
             <ProjectPreview id={project.id} />
             <div className="project-copy">
@@ -212,15 +212,6 @@ export function Projects() {
           </article>
         ))}
       </div>
-      <article className="archive-project">
-        <span className="mono archive-number">04</span>
-        <div>
-          <span className="eyebrow">PRODUCT WEBSITE / FRONTEND</span>
-          <h3>{projects[3].name}</h3>
-          <p>{projects[3].description}</p>
-        </div>
-        <ProjectLinks project={projects[3]} />
-      </article>
       <a
         className="all-projects mono"
         href="https://github.com/gautamxdev?tab=repositories"

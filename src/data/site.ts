@@ -4,99 +4,115 @@ export const navLinks = [
   { label: "Contact", href: "#contact" },
 ] as const;
 
-export type Skill = { name: string; icon?: string };
+export type Skill = {
+  name: string;
+  icon?: string;
+};
+
 export const skills: Skill[] = [
-  { name: "TypeScript" },
-  { name: "React" },
-  { name: "Next.js" },
-  { name: "Node.js" },
-  { name: "PostgreSQL" },
-  { name: "Three.js" },
-  { name: "Tailwind CSS" },
-  { name: "Git" },
+  { name: "TypeScript", icon: "devicon-typescript-plain colored" },
+  { name: "JavaScript", icon: "devicon-javascript-plain colored" },
+  { name: "Python", icon: "devicon-python-plain colored" },
+  { name: "Next.js", icon: "devicon-nextjs-plain" },
+  { name: "React", icon: "devicon-react-original colored" },
+  { name: "Node.js", icon: "devicon-nodejs-plain colored" },
+  { name: "PostgreSQL", icon: "devicon-postgresql-plain colored" },
+  { name: "Redis", icon: "devicon-redis-plain colored" },
+  { name: "Docker", icon: "devicon-docker-plain colored" },
+  { name: "Git", icon: "devicon-git-plain colored" },
+  { name: "REST APIs" },
+  { name: "GraphQL", icon: "devicon-graphql-plain colored" },
+  { name: "FastAPI", icon: "devicon-fastapi-plain colored" },
+  { name: "Tailwind CSS", icon: "devicon-tailwindcss-plain colored" },
+  { name: "Linux", icon: "devicon-linux-plain" },
+  { name: "Bash", icon: "devicon-bash-plain" },
+  { name: "Prisma", icon: "devicon-prisma-original" },
+  { name: "WebSockets" },
 ];
 
 export type Project = {
-  id: string;
   name: string;
-  category: string;
   description: string;
   stack: string[];
   liveUrl?: string;
-  liveLabel?: string;
   repoUrl?: string;
-  note: string;
+  image?: string;
 };
 
-// Verified against the public repositories. No invented adoption metrics.
 export const projects: Project[] = [
   {
-    id: "mcp-doctor",
-    name: "MCP Doctor",
-    category: "01 / DEVELOPER TOOLING",
+    name: "Sub-Agents Directory",
     description:
-      "Your tools should work together. A local-first CLI that finds conflicting MCP configurations in Cursor and helps you fix them—with backups, not guesswork.",
-    stack: ["TypeScript", "Node.js", "Vitest"],
-    liveUrl: "https://www.npmjs.com/package/mcp-doctor-cli",
-    liveLabel: "View on npm",
-    repoUrl: "https://github.com/gautamxdev/mcp-doctor-cli",
-    note: "Inspects both global and workspace MCP configurations. Changes require confirmation, backups come first, and diagnostics stay on your machine. Built for the unglamorous problems that interrupt a good coding session.",
+      "Curated collection of Claude Code sub-agent prompts and MCP servers. Discover sub-agents, prompts and more.",
+    stack: ["Next.js", "Tailwind CSS"],
+    liveUrl: "#",
+    repoUrl: "https://github.com/gautamxdev/sub-agents-directory",
+    image: "/project-sub-agents.png",
   },
   {
-    id: "sylva",
-    name: "Sylva Sounds",
-    category: "02 / CREATIVE DEVELOPMENT",
+    name: "Codejeet",
     description:
-      "An immersive home for an audio-production studio. Interactive visuals, music previews, and a project catalogue that give sound a visual identity.",
-    stack: ["Next.js", "Three.js", "GSAP", "Howler.js"],
-    liveUrl: "https://sylvasounds.com/",
-    repoUrl: "https://github.com/gautamxdev/sylva-sounds",
-    note: "Brings an audio studio’s work into the browser through motion, 3D, and playable music previews. Next.js provides the site structure; Three.js, GSAP, and Howler.js handle the visual and audio experience.",
+      "System Design and DSA learning platform with 17,000+ company-wise LeetCode questions scraped via Selenium and pSEO blogs. Serving 345K+ monthly pageviews.",
+    stack: ["Next.js", "TypeScript", "Selenium", "Tailwind CSS"],
+    liveUrl: "#",
+    repoUrl: "https://github.com/gautamxdev/codejeet",
+    image: "/project-codejeet.png",
   },
   {
-    id: "quickfill",
-    name: "TTD QuickFill",
-    category: "03 / BROWSER EXTENSION",
+    name: "DevShorts",
     description:
-      "Less repetitive typing. More control. A Chrome extension that turns saved pilgrim details into a guarded paste queue, with personal data kept on the device.",
-    stack: ["React", "TypeScript", "Vite", "Chrome APIs"],
-    repoUrl: "https://github.com/gautamxdev/ttd-quickfill",
-    note: "Uses row and field guards to guide a local paste queue. The person stays in control of verification and submission. An independent extension, with no networking or automatic form submission.",
+      "Automated short-form video generator that combines coding screencasts with engaging gaming clips and captions to boost developer engagement.",
+    stack: ["React", "TypeScript", "FFmpeg", "Tailwind CSS"],
+    liveUrl: "#",
+    repoUrl: "https://github.com/gautamxdev/devshorts",
+    image: "/project-devshorts.png",
   },
   {
-    id: "compliance",
-    name: "Compliance Flow",
-    category: "04 / PRODUCT WEBSITE",
+    name: "TrendTrader",
     description:
-      "A focused product website for a CA-firm compliance workspace, making client workflows, deadlines, and audit organisation easier to understand.",
-    stack: ["React", "TypeScript", "Vite", "Tailwind CSS"],
-    liveUrl: "https://compliance-flow-sage.vercel.app/",
-    repoUrl: "https://github.com/gautamxdev/compliance-flow",
-    note: "A frontend product website and workspace concept, exploring how a clear interface can communicate complex compliance workflows.",
+      "Social trend analysis and prediction platform that maps social media engagement peaks directly to tradeable crypto assets.",
+    stack: ["Next.js", "Python", "FastAPI", "Tailwind CSS"],
+    liveUrl: "#",
+    repoUrl: "https://github.com/gautamxdev/trendtrader",
+    image: "/project-trendtrader.png",
   },
 ];
 
 export const socialLinks = [
-  { label: "GitHub", href: "https://github.com/gautamxdev", icon: "github" },
+  {
+    label: "GitHub",
+    href: "https://github.com/gautamxdev",
+    icon: "github",
+  },
   {
     label: "LinkedIn",
     href: "https://www.linkedin.com/in/gautamalva/",
     icon: "linkedin",
   },
   {
-    label: "X / Twitter",
+    label: "X",
     href: "https://x.com/Gautamonlydevs",
     icon: "twitter",
   },
 ] as const;
+
 export const email = "shettygautam955@gmail.com";
-export const brewingCompanies = [
+
+export type BrewingCompany = {
+  name: string;
+  status: "in progress" | "beta" | "alpha" | string;
+  description: string;
+  stack: string[];
+  link?: string;
+};
+
+export const brewingCompanies: BrewingCompany[] = [
   {
     name: "Reddmark",
     status: "Live",
     description:
-      "My software studio. Websites, MVPs, and automation for people with something worth building.",
-    stack: ["Next.js", "React", "TypeScript", "GSAP"],
+      "Software, built and shipped. A studio for founders who need it done. I build MVPs, websites, and automation systems end-to-end for growing businesses, from idea to production.",
+    stack: ["MVPs", "Websites", "Automation", "WhatsApp Systems"],
     link: "https://reddmark.net/",
   },
 ];

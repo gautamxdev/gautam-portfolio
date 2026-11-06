@@ -1,3 +1,5 @@
+import { Toolkit } from "@/components/Toolkit";
+
 export function About() {
   return (
     <section
@@ -38,78 +40,7 @@ export function About() {
             Have an interesting problem? <span aria-hidden="true">↗</span>
           </a>
         </div>
-        <div className="toolkit">
-          <div className="toolkit-header">
-            <span className="mono">my-toolkit.json</span>
-            <span className="mono muted">{"{ }"}</span>
-          </div>
-          <div className="toolkit-code mono">
-            <p>
-              <span className="line-number">01</span>
-              <span className="code-muted">{"{"}</span>
-            </p>
-            <p>
-              <span className="line-number">02</span>
-              <span className="code-property">&quot;interfaces&quot;</span>
-              <span>: [</span>
-            </p>
-            <p className="code-indent">
-              <span className="line-number">03</span>
-              <span>
-                &quot;React&quot;, &quot;Next.js&quot;, &quot;TypeScript&quot;
-              </span>
-            </p>
-            <p>
-              <span className="line-number">04</span>
-              <span>],</span>
-            </p>
-            <p>
-              <span className="line-number">05</span>
-              <span className="code-property">&quot;systems&quot;</span>
-              <span>: [</span>
-            </p>
-            <p className="code-indent">
-              <span className="line-number">06</span>
-              <span>
-                &quot;Node.js&quot;, &quot;PostgreSQL&quot;, &quot;APIs&quot;
-              </span>
-            </p>
-            <p>
-              <span className="line-number">07</span>
-              <span>],</span>
-            </p>
-            <p>
-              <span className="line-number">08</span>
-              <span className="code-property">&quot;play&quot;</span>
-              <span>: [</span>
-            </p>
-            <p className="code-indent">
-              <span className="line-number">09</span>
-              <span>
-                &quot;Three.js&quot;, &quot;GSAP&quot;, &quot;Canvas&quot;
-              </span>
-            </p>
-            <p>
-              <span className="line-number">10</span>
-              <span>],</span>
-            </p>
-            <p>
-              <span className="line-number">11</span>
-              <span className="code-property">&quot;always&quot;</span>
-              <span>: &quot;learning&quot;</span>
-            </p>
-            <p>
-              <span className="line-number">12</span>
-              <span className="code-muted">{"}"}</span>
-            </p>
-          </div>
-          <div className="toolkit-footer mono">
-            <span>
-              <span className="status-light" /> WORK IN PROGRESS
-            </span>
-            <span>JUST LIKE ME.</span>
-          </div>
-        </div>
+        <Toolkit />
       </div>
     </section>
   );

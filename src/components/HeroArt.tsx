@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { preload } from "react-dom";
 import "./HeroArt.css";
 
 type Particle = {
@@ -19,6 +20,8 @@ type ArtEngine = {
   setOutputVisible: (visible: boolean) => void;
 };
 
+const ART_SOURCE = "/hero-art.webp";
+
 const SOURCE_LINES = [
   { text: "// A little physics. A human connection.", kind: "comment" },
   { text: "const dx = particle.x - pointer.x;", kind: "code" },
@@ -35,6 +38,8 @@ const SOURCE_LINES = [
 ] as const;
 
 export function HeroArt() {
+  preload(ART_SOURCE, { as: "image" });
+
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<ArtEngine | null>(null);
@@ -138,7 +143,7 @@ export function HeroArt() {
       if (buildStarted >= 0 && !buildingNow) {
         buildStarted = -1;
         setBuilding(false);
-        setAnnouncement("Build complete. The hands are reassembled.");
+        setAnnouncement("The hands are reassembled.");
       }
       return unsettled || buildingNow;
     };
@@ -282,7 +287,6 @@ export function HeroArt() {
         setReady(true);
         wake();
       } catch {
-        // Keep the original image visible if pixel sampling is unavailable.
         setReady(false);
       }
     };
@@ -293,7 +297,7 @@ export function HeroArt() {
       if (reducedMotion) {
         settle();
         paint(performance.now());
-        setAnnouncement("Build complete. Reduced motion is enabled.");
+        setAnnouncement("Artwork reset. Reduced motion is enabled.");
         setBuilding(false);
         return;
       }
@@ -301,7 +305,7 @@ export function HeroArt() {
       buildStarted = now;
       activeUntil = now + 2000;
       setBuilding(true);
-      setAnnouncement("Rebuilding the connection.");
+      setAnnouncement("Scattering and reassembling the particles.");
       for (const particle of particles) {
         const angle = particle.seed * 2.39996;
         const power = 3 + (particle.seed % 13);
@@ -369,11 +373,7 @@ export function HeroArt() {
       loaded = true;
       resize();
     };
-    source.src = "/hero-art.webp";
-    if (source.complete && source.naturalWidth > 0) {
-      loaded = true;
-      resize();
-    }
+    source.src = ART_SOURCE;
 
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(stage);
@@ -446,7 +446,7 @@ export function HeroArt() {
             className="hands-coordinate hands-coordinate-top"
             aria-hidden="true"
           >
-            FIG. 001 — THE CONNECTION
+            CANVAS / PARTICLE STUDY
           </span>
           <span className="hands-axis hands-axis-x" aria-hidden="true">
             x
@@ -459,13 +459,8 @@ export function HeroArt() {
             className={`hands-canvas${ready ? " is-loaded" : ""}`}
             role="img"
             aria-hidden={!ready}
-            aria-label="Interactive pointillist hands. Move your pointer through the particles, or use Run build to scatter and reassemble them."
+            aria-label="Two hands made of interactive particles. Move your pointer through them, or choose Run build to scatter and reassemble them."
           />
-          <div className="hands-art-caption" aria-hidden="true">
-            <span>human input</span>
-            <span className="hands-caption-line" />
-            <span>digital output</span>
-          </div>
           <span className="hands-corner hands-corner-tl" aria-hidden="true" />
           <span className="hands-corner hands-corner-tr" aria-hidden="true" />
           <span className="hands-corner hands-corner-bl" aria-hidden="true" />
@@ -474,7 +469,7 @@ export function HeroArt() {
 
         <div className="hands-source" hidden={view !== "source"}>
           <div className="hands-source-label">
-            A glimpse inside the interaction
+            Pointer interaction
           </div>
           <ol className="hands-source-code">
             {SOURCE_LINES.map((line, index) => (

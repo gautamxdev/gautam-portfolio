@@ -1,0 +1,231 @@
+.stack-flow {
+  --token-width: 200px;
+  --stream-gap: 20px;
+  width: 100%;
+  max-width: 600px;
+  min-width: 0;
+}
+
+.stack-flow-header {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  padding-inline: 12px;
+}
+
+.stack-flow-header h3 {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+}
+
+.stack-flow-window {
+  position: relative;
+  display: grid;
+  align-items: center;
+  height: 378px;
+  overflow: hidden;
+  isolation: isolate;
+  mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+}
+
+.stack-flow-window::before {
+  content: "";
+  position: absolute;
+  inset: 30px 0;
+  z-index: -1;
+  background: radial-gradient(ellipse at 50% 50%, #ff5c280a, transparent 65%);
+  pointer-events: none;
+}
+
+.stack-ribbons {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  transform: rotate(-7deg) scale(1.04);
+}
+
+.stack-stream {
+  min-width: 0;
+}
+
+.stack-stream-track {
+  display: flex;
+  width: max-content;
+  animation: stack-drift 38s linear infinite;
+  animation-delay: -7s;
+}
+
+.stack-stream:nth-child(2) .stack-stream-track {
+  animation-duration: 46s;
+  animation-direction: reverse;
+  animation-delay: -20s;
+}
+
+.stack-stream:nth-child(3) .stack-stream-track {
+  animation-duration: 32s;
+  animation-delay: -3s;
+}
+
+.stack-stream-set {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--stream-gap);
+  margin: 0;
+  padding: 0 var(--stream-gap) 0 0;
+  list-style: none;
+}
+
+.stack-token {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  flex: 0 0 var(--token-width);
+  width: var(--token-width);
+  height: 82px;
+  padding: 18px 21px;
+  border: 1px solid #ffffff14;
+  border-top-color: #ffffff20;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #1c1c1a, #111110 80%);
+  box-shadow: 0 5px 10px #0002, inset 0 1px 0 #ffffff03;
+  transition: border-color 200ms ease, background 200ms ease, transform 200ms ease;
+}
+
+.stack-token img {
+  display: block;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  transition: filter 200ms ease, transform 200ms ease;
+}
+
+.stack-token > span {
+  color: #dcdcd4;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stack-flow-window:hover .stack-stream-track {
+    animation-play-state: paused;
+  }
+
+  .stack-token:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--brand) 45%, transparent);
+    background: color-mix(in srgb, var(--brand) 7%, #151513);
+  }
+
+  .stack-token:hover img {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--brand) 25%, transparent));
+  }
+}
+
+@keyframes stack-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (max-width: 800px) {
+  .stack-flow {
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .stack-flow {
+    --token-width: 164px;
+    --stream-gap: 14px;
+  }
+
+  .stack-flow-header {
+    padding-inline: 0;
+  }
+
+  .stack-flow-window {
+    height: 324px;
+    mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
+  }
+
+  .stack-ribbons {
+    gap: 14px;
+  }
+
+  .stack-token {
+    height: 72px;
+    gap: 12px;
+    padding: 15px 17px;
+    border-radius: 12px;
+  }
+
+  .stack-token img {
+    flex-basis: 30px;
+    width: 30px;
+    height: 30px;
+  }
+
+  .stack-token > span {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack-flow-window {
+    height: auto;
+    overflow: visible;
+    padding-top: 24px;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .stack-ribbons {
+    display: block;
+    transform: none;
+  }
+
+  .stack-stream-track {
+    display: block;
+    width: 100%;
+    animation: none;
+  }
+
+  .stack-stream-set {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 155px), 1fr));
+    padding: 0 0 var(--stream-gap);
+  }
+
+  .stack-stream-set[aria-hidden="true"] {
+    display: none;
+  }
+
+  .stack-token {
+    width: auto;
+    padding-inline: 14px;
+    gap: 10px;
+  }
+
+  .stack-token > span {
+    font-size: 12px;
+  }
+
+  .stack-token,
+  .stack-token img {
+    transition: none;
+  }
+
+  .stack-token:hover,
+  .stack-token:hover img {
+    transform: none;
+  }
+}
